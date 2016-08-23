@@ -45,7 +45,6 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 @property (nonatomic, readwrite) CGFloat progress;
 @property (nonatomic, readwrite) NSUInteger activityCount;
 
-@property (nonatomic, readonly) CGFloat visibleKeyboardHeight;
 
 - (void)updateHUDFrame;
 - (void)updateMask;
@@ -523,7 +522,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
             self.backgroundLayer = layer;
             self.backgroundLayer.frame = self.bounds;
             CGPoint gradientCenter = self.center;
-            gradientCenter.y = (self.bounds.size.height - self.visibleKeyboardHeight)/2;
+            gradientCenter.y = self.bounds.size.height / 2;
             layer.gradientCenter = gradientCenter;
             [self.backgroundLayer setNeedsDisplay];
             
@@ -727,7 +726,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
             }
         }
     } else {
-        keyboardHeight = self.visibleKeyboardHeight;
+        keyboardHeight = 0;
     }
 #endif
     
@@ -1321,31 +1320,6 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
         [self.hudView addSubview:_imageView];
     }
     return _imageView;
-}
-
-- (CGFloat)visibleKeyboardHeight {
-#if !defined(SV_APP_EXTENSIONS)
-    UIWindow *keyboardWindow = nil;
-    for (UIWindow *testWindow in [[UIApplication sharedApplication] windows]) {
-        if(![[testWindow class] isEqual:[UIWindow class]]) {
-            keyboardWindow = testWindow;
-            break;
-        }
-    }
-    
-    for (__strong UIView *possibleKeyboard in [keyboardWindow subviews]) {
-        if([possibleKeyboard isKindOfClass:NSClassFromString(@"UIPeripheralHostView")] || [possibleKeyboard isKindOfClass:NSClassFromString(@"UIKeyboard")]) {
-            return CGRectGetHeight(possibleKeyboard.bounds);
-        } else if([possibleKeyboard isKindOfClass:NSClassFromString(@"UIInputSetContainerView")]) {
-            for (__strong UIView *possibleKeyboardSubview in [possibleKeyboard subviews]) {
-                if([possibleKeyboardSubview isKindOfClass:NSClassFromString(@"UIInputSetHostView")]) {
-                    return CGRectGetHeight(possibleKeyboardSubview.bounds);
-                }
-            }
-        }
-    }
-#endif
-    return 0;
 }
 
 
